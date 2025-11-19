@@ -5,102 +5,136 @@
     ViewData["Title"] = "Customer Dashboard";
 }
 
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid mt-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
         <div class="col-12">
-            <h2 class="mb-4">
-                <i class="fas fa-tachometer-alt"></i> Welcome, @Model.Customer.FullName
-            </h2>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-chart-line text-primary me-2"></i>Welcome back, <span class="text-primary">@Model.Customer.FullName</span>!
+                    </h2>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-calendar-day me-1"></i>
+                        <span id="currentDateTime"></span>
+                    </p>
+                </div>
+                <div>
+                    <a href="@Url.Action("CreateTransaction")" class="btn btn-primary btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i>New Transaction
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Account Summary Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Total Balance</h6>
-                            <h3 class="mb-0">₹@Model.TotalBalance.ToString("N2")</h3>
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Balance Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 dashboard-card">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="flex-grow-1">
+                            <p class="text-muted text-uppercase small mb-2 fw-semibold">Total Balance</p>
+                            <h2 class="mb-0 fw-bold text-primary">₹@Model.TotalBalance.ToString("N2")</h2>
                         </div>
-                        <div>
-                            <i class="fas fa-wallet fa-3x opacity-50"></i>
+                        <div class="stat-icon bg-primary bg-opacity-10 rounded ms-3">
+                            <i class="fas fa-wallet fa-2x text-primary"></i>
                         </div>
                     </div>
+                    <small class="text-muted mt-auto">
+                        <i class="fas fa-arrow-up text-success me-1"></i> Across all accounts
+                    </small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Total Accounts</h6>
-                            <h3 class="mb-0">@Model.Accounts.Count</h3>
+        <!-- Total Accounts Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 dashboard-card">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="flex-grow-1">
+                            <p class="text-muted text-uppercase small mb-2 fw-semibold">Total Accounts</p>
+                            <h2 class="mb-0 fw-bold text-success">@Model.Accounts.Count</h2>
                         </div>
-                        <div>
-                            <i class="fas fa-university fa-3x opacity-50"></i>
+                        <div class="stat-icon bg-success bg-opacity-10 rounded ms-3">
+                            <i class="fas fa-university fa-2x text-success"></i>
                         </div>
                     </div>
+                    <small class="text-muted mt-auto">
+                        <i class="fas fa-check-circle text-success me-1"></i> Active accounts
+                    </small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Recent Transactions</h6>
-                            <h3 class="mb-0">@Model.RecentTransactions.Count</h3>
+        <!-- Recent Transactions Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 dashboard-card">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="flex-grow-1">
+                            <p class="text-muted text-uppercase small mb-2 fw-semibold">Transactions</p>
+                            <h2 class="mb-0 fw-bold text-info">@Model.RecentTransactions.Count</h2>
                         </div>
-                        <div>
-                            <i class="fas fa-exchange-alt fa-3x opacity-50"></i>
+                        <div class="stat-icon bg-info bg-opacity-10 rounded ms-3">
+                            <i class="fas fa-exchange-alt fa-2x text-info"></i>
                         </div>
                     </div>
+                    <small class="text-muted mt-auto">
+                        <i class="fas fa-clock text-info me-1"></i> Recent activity
+                    </small>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1">Pending</h6>
-                            <h3 class="mb-0">@Model.PendingTransactionsCount</h3>
+        <!-- Pending Transactions Card -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 dashboard-card">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="flex-grow-1">
+                            <p class="text-muted text-uppercase small mb-2 fw-semibold">Pending</p>
+                            <h2 class="mb-0 fw-bold text-warning">@Model.PendingTransactionsCount</h2>
                         </div>
-                        <div>
-                            <i class="fas fa-clock fa-3x opacity-50"></i>
+                        <div class="stat-icon bg-warning bg-opacity-10 rounded ms-3">
+                            <i class="fas fa-hourglass-half fa-2x text-warning"></i>
                         </div>
                     </div>
+                    <small class="text-muted mt-auto">
+                        <i class="fas fa-spinner text-warning me-1"></i> Awaiting approval
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Charts Row -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Transaction Summary</h5>
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-chart-pie text-primary me-2"></i>Transaction Summary
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <canvas id="transactionChart" height="200"></canvas>
+                <div class="card-body" style="height: 300px; position: relative;">
+                    <canvas id="transactionChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Balance Overview</h5>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-chart-bar text-success me-2"></i>Account Balances
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <canvas id="balanceChart" height="200"></canvas>
+                <div class="card-body" style="height: 300px; position: relative;">
+                    <canvas id="balanceChart"></canvas>
                 </div>
             </div>
         </div>
@@ -109,27 +143,43 @@
     <!-- Accounts Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-university"></i> My Accounts</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fas fa-university text-primary me-2"></i>My Accounts
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if (Model.Accounts.Any())
                     {
-                        <div class="row">
+                        <div class="row g-3">
                             @foreach (var account in Model.Accounts)
                             {
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-primary">
-                                        <div class="card-body">
-                                            <h5 class="card-title">@account.AccountTypeName Account</h5>
-                                            <p class="card-text">
-                                                <strong>Account Number:</strong> @account.AccountNumber<br>
-                                                <strong>Balance:</strong> ₹@account.Balance.ToString("N2")<br>
-                                                <strong>Status:</strong> <span class="badge bg-success">@account.Status</span>
-                                            </p>
-                                            <a href="@Url.Action("Transactions", new { accountId = account.AccountID })" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-list"></i> View Transactions
+                                <div class="col-lg-6">
+                                    <div class="account-card p-4 rounded border">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h5 class="mb-1 fw-bold">@account.AccountTypeName Account</h5>
+                                                <p class="text-muted mb-0 small">
+                                                    <i class="fas fa-credit-card me-1"></i>@account.AccountNumber
+                                                </p>
+                                            </div>
+                                            <span class="badge bg-success px-3 py-2">
+                                                <i class="fas fa-check-circle me-1"></i>@account.Status
+                                            </span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-1">Available Balance</small>
+                                            <h3 class="mb-0 fw-bold text-success">₹@account.Balance.ToString("N2")</h3>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="@Url.Action("Transactions", new { accountId = account.AccountID })"
+                                               class="btn btn-outline-primary btn-sm flex-fill">
+                                                <i class="fas fa-list me-1"></i> Transactions
+                                            </a>
+                                            <a href="@Url.Action("CreateTransaction")"
+                                               class="btn btn-primary btn-sm flex-fill">
+                                                <i class="fas fa-paper-plane me-1"></i> Transfer
                                             </a>
                                         </div>
                                     </div>
@@ -139,86 +189,13 @@
                     }
                     else
                     {
-                        <p class="text-muted">No accounts found.</p>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Transactions -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Transactions</h5>
-                    <a href="@Url.Action("CreateTransaction")" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> New Transaction
-                    </a>
-                </div>
-                <div class="card-body">
-                    @if (Model.RecentTransactions.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="transactionsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Type</th>
-                                        <th>Account</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Description</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var transaction in Model.RecentTransactions)
-                                    {
-                                        <tr>
-                                            <td>@transaction.TransactionDate.ToString("dd MMM yyyy HH:mm")</td>
-                                            <td>
-                                                @switch (transaction.TransactionType)
-                                                {
-                                                    case 1:
-                                                        <span class="badge bg-success">Deposit</span>
-                                                        break;
-                                                    case 2:
-                                                        <span class="badge bg-danger">Withdrawal</span>
-                                                        break;
-                                                    case 3:
-                                                        <span class="badge bg-info">Transfer</span>
-                                                        break;
-                                                    default:
-                                                        <span class="badge bg-secondary">Other</span>
-                                                        break;
-                                                }
-                                            </td>
-                                            <td>@transaction.AccountNumber</td>
-                                            <td>₹@transaction.Amount.ToString("N2")</td>
-                                            <td>
-                                                @switch (transaction.Status)
-                                                {
-                                                    case 1:
-                                                        <span class="badge bg-warning">Pending</span>
-                                                        break;
-                                                    case 2:
-                                                        <span class="badge bg-success">Approved</span>
-                                                        break;
-                                                    case 3:
-                                                        <span class="badge bg-danger">Rejected</span>
-                                                        break;
-                                                }
-                                            </td>
-                                            <td>@transaction.Description</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                        <div class="alert alert-info border-0 d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">No Accounts Found</h5>
+                                <p class="mb-0">Contact support to open a new account.</p>
+                            </div>
                         </div>
-                    }
-                    else
-                    {
-                        <p class="text-muted">No recent transactions.</p>
                     }
                 </div>
             </div>
@@ -229,69 +206,199 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // Initialize DataTable
-            $('#transactionsTable').DataTable({
-                "pageLength": 10,
-                "ordering": true,
-                "searching": true
-            });
+            // Update current date and time
+            function updateDateTime() {
+                const now = new Date();
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                $('#currentDateTime').text(now.toLocaleDateString('en-US', options));
+            }
 
-            // Transaction Type Chart
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+
+            // Initialize DataTable if exists
+            if ($('#transactionsTable').length) {
+                $('#transactionsTable').DataTable({
+                    "pageLength": 10,
+                    "order": [[0, "desc"]],
+                    "columnDefs": [
+                        { "orderable": false, "targets": [5] }
+                    ]
+                });
+            }
+
+            // Transaction Type Chart Data
             var deposits = @Model.RecentTransactions.Count(t => t.TransactionType == 1);
             var withdrawals = @Model.RecentTransactions.Count(t => t.TransactionType == 2);
             var transfers = @Model.RecentTransactions.Count(t => t.TransactionType == 3);
 
-            var transactionCtx = document.getElementById('transactionChart').getContext('2d');
-            new Chart(transactionCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Deposits', 'Withdrawals', 'Transfers'],
-                    datasets: [{
-                        data: [deposits, withdrawals, transfers],
-                        backgroundColor: ['#28a745', '#dc3545', '#17a2b8']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+            // Transaction Chart
+            var transactionCtx = document.getElementById('transactionChart');
+            if (transactionCtx) {
+                new Chart(transactionCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Deposits', 'Withdrawals', 'Transfers'],
+                        datasets: [{
+                            data: [deposits, withdrawals, transfers],
+                            backgroundColor: ['#28a745', '#dc3545', '#17a2b8'],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 1.5,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
-            // Balance Chart
+            // Balance Chart Data
             var accountLabels = [@Html.Raw(string.Join(",", Model.Accounts.Select(a => "'" + a.AccountTypeName + "'")))];
             var accountBalances = [@string.Join(",", Model.Accounts.Select(a => a.Balance))];
 
-            var balanceCtx = document.getElementById('balanceChart').getContext('2d');
-            new Chart(balanceCtx, {
-                type: 'bar',
-                data: {
-                    labels: accountLabels,
-                    datasets: [{
-                        label: 'Balance (₹)',
-                        data: accountBalances,
-                        backgroundColor: '#007bff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            // Balance Chart
+            var balanceCtx = document.getElementById('balanceChart');
+            if (balanceCtx) {
+                new Chart(balanceCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: accountLabels,
+                        datasets: [{
+                            label: 'Balance (₹)',
+                            data: accountBalances,
+                            backgroundColor: 'rgba(25, 135, 84, 0.8)',
+                            borderColor: '#198754',
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 1.5,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value.toLocaleString('en-IN');
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         });
     </script>
+
+    <style>
+        /* Dashboard Card Hover Effect */
+        .dashboard-card {
+            transition: all 0.3s ease;
+            min-height: 160px;
+        }
+
+            .dashboard-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+            }
+
+            /* Ensure card body uses flexbox for consistent alignment */
+            .dashboard-card .card-body {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 120px;
+            }
+
+        /* Stat Icon - Fixed dimensions */
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .stat-icon i {
+                line-height: 1;
+            }
+
+        /* Ensure consistent heading heights */
+        .dashboard-card h2 {
+            line-height: 1.2;
+            min-height: 2.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Consistent label heights */
+        .dashboard-card .text-uppercase {
+            line-height: 1.5;
+            min-height: 1.5rem;
+        }
+
+        /* Bottom text alignment */
+        .dashboard-card small {
+            line-height: 1.5;
+            display: block;
+        }
+
+        /* Account Card Styling */
+        .account-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef !important;
+        }
+
+            .account-card:hover {
+                border-color: var(--bs-primary) !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-3px);
+            }
+
+        /* Table Styling */
+        #transactionsTable tbody tr {
+            transition: all 0.2s ease;
+        }
+
+            #transactionsTable tbody tr:hover {
+                background-color: #f8f9fa;
+                transform: scale(1.01);
+            }
+
+        /* Chart container fixes */
+        canvas {
+            max-height: 280px !important;
+        }
+    </style>
 }

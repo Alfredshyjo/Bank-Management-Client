@@ -3,89 +3,202 @@
 @model TransactionViewModel
 
 @{
-
     ViewData["Title"] = "New Transaction";
-
     var accounts = ViewBag.Accounts as List<AccountDto>;
-
 }
 
-<div class="container">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-exchange-alt"></i> New Transaction</h4>
+        <div class="col-lg-8 col-md-10">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="fas fa-exchange-alt fa-3x text-primary"></i>
                 </div>
-                <div class="card-body">
+                <h2 class="fw-bold">New Transaction</h2>
+                <p class="text-muted">Transfer money, deposit, or withdraw funds securely</p>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <!-- Card Header -->
+                <div class="card-header text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-wallet fa-2x me-3"></i>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Transaction Details</h4>
+                            <small style="opacity: 0.9;">Fill in the form to process your transaction</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4">
                     <form asp-action="CreateTransaction" method="post" id="transactionForm">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
 
-                        <div class="mb-3">
-                            <label asp-for="AccountID" class="form-label">Select Account *</label>
-                            <select asp-for="AccountID" class="form-select" id="accountSelect" required>
-                                <option value="">-- Select Account --</option>
-
-                                @if (accounts != null)
-
+                        <!-- Account Selection -->
+                        <div class="mb-4">
+                            <label asp-for="AccountID" class="form-label fw-semibold">
+                                <i class="fas fa-university me-1"></i> Select Your Account <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="AccountID" class="form-select form-select-lg" id="accountSelect" required>
+                                <option value="">-- Choose an Account --</option>
+                                @if (accounts != null && accounts.Any())
                                 {
-
-                                    @foreach (var account in accounts)
-
+                                    foreach (var account in accounts)
                                     {
-                                        <option value="@account.AccountID" data-balance="@account.Balance" data-number="@account.AccountNumber">
-
-                                            @account.AccountTypeName - @account.AccountNumber (Balance: ₹@account.Balance.ToString("N2"))
+                                        <option value="@account.AccountID"
+                                                data-balance="@account.Balance"
+                                                data-number="@account.AccountNumber"
+                                                data-type="@account.AccountTypeName">
+                                            @account.AccountTypeName - @account.AccountNumber (₹@account.Balance.ToString("N2"))
                                         </option>
-
                                     }
-
                                 }
                             </select>
-                            <span asp-validation-for="AccountID" class="text-danger"></span>
+                            <span asp-validation-for="AccountID" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Account Balance Display -->
+                        <div class="alert alert-info border-0 mb-4" id="accountInfo" style="display: none;">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <small class="text-muted d-block">Account Number</small>
+                                    <strong id="displayAccountNumber">-</strong>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <small class="text-muted d-block">Available Balance</small>
+                                    <h4 class="mb-0 text-success" id="displayBalance">₹0.00</h4>
+                                </div>
+                            </div>
                         </div>
 
                         <input type="hidden" asp-for="AccountNumber" id="accountNumber" />
                         <input type="hidden" asp-for="CurrentBalance" id="currentBalance" />
 
-                        <div class="mb-3">
-                            <label asp-for="TransactionType" class="form-label">Transaction Type *</label>
-                            <select asp-for="TransactionType" class="form-select" id="transactionType" required>
-                                <option value="">-- Select Type --</option>
-                                <option value="1">Deposit</option>
-                                <option value="2">Withdrawal</option>
-                                <option value="3">Transfer</option>
-                            </select>
-                            <span asp-validation-for="TransactionType" class="text-danger"></span>
+                        <!-- Transaction Type -->
+                        <div class="mb-4">
+                            <label asp-for="TransactionType" class="form-label fw-semibold">
+                                <i class="fas fa-list-alt me-1"></i> Transaction Type <span class="text-danger">*</span>
+                            </label>
+                            <div class="row g-3" id="transactionTypeOptions">
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="TransactionType" id="typeDeposit" value="1" autocomplete="off">
+                                    <label class="btn btn-outline-success w-100 py-3" for="typeDeposit">
+                                        <i class="fas fa-arrow-down fa-2x d-block mb-2"></i>
+                                        <strong>Deposit</strong>
+                                        <small class="d-block text-muted">Add money</small>
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="TransactionType" id="typeWithdrawal" value="2" autocomplete="off">
+                                    <label class="btn btn-outline-danger w-100 py-3" for="typeWithdrawal">
+                                        <i class="fas fa-arrow-up fa-2x d-block mb-2"></i>
+                                        <strong>Withdrawal</strong>
+                                        <small class="d-block text-muted">Take out money</small>
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="TransactionType" id="typeTransfer" value="3" autocomplete="off">
+                                    <label class="btn btn-outline-primary w-100 py-3" for="typeTransfer">
+                                        <i class="fas fa-exchange-alt fa-2x d-block mb-2"></i>
+                                        <strong>Transfer</strong>
+                                        <small class="d-block text-muted">Send money</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="TransactionType" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3" id="recipientSection" style="display:none;">
-                            <label asp-for="RecipientAccountNumber" class="form-label">Recipient Account Number *</label>
-                            <input asp-for="RecipientAccountNumber" class="form-control" id="recipientAccountNumber" placeholder="Enter recipient account number" />
-                            <span asp-validation-for="RecipientAccountNumber" class="text-danger"></span>
+                        <!-- Recipient Account (for Transfer) -->
+                        <div class="mb-4" id="recipientSection" style="display:none;">
+                            <label asp-for="RecipientAccountNumber" class="form-label fw-semibold">
+                                <i class="fas fa-user me-1"></i> Recipient Account Number <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-credit-card text-muted"></i>
+                                </span>
+                                <input asp-for="RecipientAccountNumber"
+                                       class="form-control"
+                                       id="recipientAccountNumber"
+                                       placeholder="Enter recipient account number" />
+                            </div>
+                            <span asp-validation-for="RecipientAccountNumber" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Amount" class="form-label">Amount *</label>
-                            <input asp-for="Amount" type="number" step="0.01" class="form-control" placeholder="Enter amount" required />
-                            <span asp-validation-for="Amount" class="text-danger"></span>
-                            <small class="text-muted" id="balanceInfo"></small>
+                        <!-- Amount -->
+                        <div class="mb-4">
+                            <label asp-for="Amount" class="form-label fw-semibold">
+                                <i class="fas fa-rupee-sign me-1"></i> Amount <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light">₹</span>
+                                <input asp-for="Amount"
+                                       type="number"
+                                       step="0.01"
+                                       min="1"
+                                       class="form-control form-control-lg"
+                                       placeholder="0.00"
+                                       id="amountInput"
+                                       required />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger small"></span>
+                            <small class="text-muted d-block mt-1" id="balanceInfo"></small>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Description</label>
-<textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter transaction description"></textarea>
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-semibold">
+                                <i class="fas fa-comment-alt me-1"></i> Description (Optional)
+                            </label>
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Add a note about this transaction (e.g., payment for services, rent, etc.)"></textarea>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane"></i> Submit Transaction
-                            </button>
-                            <a href="@Url.Action("Dashboard")" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Dashboard
-                            </a>
+                        <!-- Transaction Summary (appears after filling) -->
+                        <div class="alert alert-warning border-0 mb-4" id="transactionSummary" style="display: none;">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Transaction Summary
+                            </h6>
+                            <hr>
+                            <div class="row">
+                                <div class="col-6"><strong>Type:</strong></div>
+                                <div class="col-6 text-end" id="summaryType">-</div>
+                                <div class="col-6"><strong>Amount:</strong></div>
+                                <div class="col-6 text-end" id="summaryAmount">-</div>
+                                <div class="col-6" id="recipientLabel" style="display:none;"><strong>To:</strong></div>
+                                <div class="col-6 text-end" id="summaryRecipient" style="display:none;">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg" id="submitBtn">
+                                    <i class="fas fa-paper-plane me-2"></i> Process Transaction
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline-secondary w-100 btn-lg">
+                                    <i class="fas fa-times me-2"></i> Cancel
+                                </a>
+                            </div>
                         </div>
                     </form>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="card-footer bg-light text-center py-2">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt text-success me-1"></i>
+                        All transactions are secure and encrypted
+                    </small>
                 </div>
             </div>
         </div>
@@ -95,109 +208,188 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-
         $(document).ready(function() {
-
             // Handle account selection
-
             $('#accountSelect').change(function() {
-
                 var selectedOption = $(this).find('option:selected');
-
                 var accountNumber = selectedOption.data('number');
-
                 var balance = selectedOption.data('balance');
+                var accountType = selectedOption.data('type');
 
                 $('#accountNumber').val(accountNumber);
-
                 $('#currentBalance').val(balance);
 
                 if(balance !== undefined) {
-
-                    $('#balanceInfo').text('Available balance: ₹' + parseFloat(balance).toFixed(2));
-
+                    $('#displayAccountNumber').text(accountNumber);
+                    $('#displayBalance').text('₹' + parseFloat(balance).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                    $('#accountInfo').fadeIn();
+                    updateBalanceInfo();
+                } else {
+                    $('#accountInfo').hide();
                 }
-
             });
 
-            // Show/hide recipient field based on transaction type
-
-            $('#transactionType').change(function() {
-
+            // Handle transaction type selection
+            $('input[name="TransactionType"]').change(function() {
                 var transactionType = $(this).val();
 
                 if(transactionType == '3') { // Transfer
-
-                    $('#recipientSection').show();
-
+                    $('#recipientSection').slideDown();
                     $('#recipientAccountNumber').attr('required', true);
-
                 } else {
-
-                    $('#recipientSection').hide();
-
+                    $('#recipientSection').slideUp();
                     $('#recipientAccountNumber').attr('required', false);
-
                     $('#recipientAccountNumber').val('');
-
                 }
 
+                updateBalanceInfo();
+                updateSummary();
+            });
+
+            // Update balance info based on transaction type
+            function updateBalanceInfo() {
+                var transactionType = $('input[name="TransactionType"]:checked').val();
+                var balance = parseFloat($('#currentBalance').val());
+
+                if (transactionType == '2' || transactionType == '3') {
+                    $('#balanceInfo').html('<i class="fas fa-info-circle me-1"></i>Available for withdrawal: ₹' + balance.toLocaleString('en-IN', {minimumFractionDigits: 2}));
+                    $('#balanceInfo').removeClass('text-muted').addClass('text-primary');
+                } else {
+                    $('#balanceInfo').text('');
+                }
+            }
+
+            // Update transaction summary
+            function updateSummary() {
+                var typeText = $('input[name="TransactionType"]:checked').next('label').find('strong').text();
+                var amount = $('#amountInput').val();
+                var recipient = $('#recipientAccountNumber').val();
+                var transactionType = $('input[name="TransactionType"]:checked').val();
+
+                if (typeText && amount > 0) {
+                    $('#summaryType').text(typeText);
+                    $('#summaryAmount').text('₹' + parseFloat(amount).toLocaleString('en-IN', {minimumFractionDigits: 2}));
+
+                    if (transactionType == '3' && recipient) {
+                        $('#recipientLabel, #summaryRecipient').show();
+                        $('#summaryRecipient').text(recipient);
+                    } else {
+                        $('#recipientLabel, #summaryRecipient').hide();
+                    }
+
+                    $('#transactionSummary').slideDown();
+                } else {
+                    $('#transactionSummary').hide();
+                }
+            }
+
+            // Update summary on amount change
+            $('#amountInput, #recipientAccountNumber').on('input', function() {
+                updateSummary();
             });
 
             // Form validation before submit
-
             $('#transactionForm').submit(function(e) {
-
-                var transactionType = $('#transactionType').val();
-
-                var amount = parseFloat($('#Amount').val());
-
+                var transactionType = $('input[name="TransactionType"]:checked').val();
+                var amount = parseFloat($('#amountInput').val());
                 var balance = parseFloat($('#currentBalance').val());
-
                 var recipientAccount = $('#recipientAccountNumber').val();
+                var accountNumber = $('#accountNumber').val();
+
+                // Validate account selection
+                if (!accountNumber) {
+                    e.preventDefault();
+                    toastr.error('Please select an account');
+                    return false;
+                }
+
+                // Validate transaction type
+                if (!transactionType) {
+                    e.preventDefault();
+                    toastr.error('Please select a transaction type');
+                    return false;
+                }
 
                 // Validate transfer has recipient
-
                 if(transactionType == '3' && !recipientAccount) {
-
                     e.preventDefault();
-
                     toastr.error('Please enter recipient account number for transfer');
-
                     return false;
+                }
 
+                // Validate recipient is not same as sender
+                if(transactionType == '3' && recipientAccount == accountNumber) {
+                    e.preventDefault();
+                    toastr.error('Cannot transfer to the same account');
+                    return false;
                 }
 
                 // Validate withdrawal/transfer doesn't exceed balance
-
                 if((transactionType == '2' || transactionType == '3') && amount > balance) {
-
                     e.preventDefault();
-
-                    toastr.error('Insufficient balance. Available: ₹' + balance.toFixed(2));
-
+                    toastr.error('Insufficient balance. Available: ₹' + balance.toLocaleString('en-IN', {minimumFractionDigits: 2}));
                     return false;
-
                 }
 
                 // Validate amount is positive
-
                 if(amount <= 0) {
-
                     e.preventDefault();
-
                     toastr.error('Amount must be greater than zero');
-
                     return false;
-
                 }
 
+                // Show loading state
+                const btn = $('#submitBtn');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Processing...');
+                //showLoading('Processing your transaction...');
+
                 return true;
-
             });
-
         });
     </script>
 
-}
+    <style>
+        /* Transaction type button styling */
+        .btn-check:checked + label {
+            background-color: var(--bs-primary);
+            color: white;
+        }
 
+            .btn-check:checked + label.btn-outline-success {
+                background-color: #198754;
+                border-color: #198754;
+            }
+
+            .btn-check:checked + label.btn-outline-danger {
+                background-color: #dc3545;
+                border-color: #dc3545;
+            }
+
+        /* Smooth animations */
+        #accountInfo, #recipientSection, #transactionSummary {
+            animation: slideDown 0.3s ease;
+        }
+
+        @@keyframes slideDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        /* Amount input focus */
+        #amountInput:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+    </style>
+}

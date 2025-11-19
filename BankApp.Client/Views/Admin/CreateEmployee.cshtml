@@ -5,71 +5,145 @@
     ViewData["Title"] = "Create Employee";
 }
 
-<div class="container">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-plus"></i> Create New Employee</h4>
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <!-- Header -->
+                <div class="card-header text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-user-tie fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Create New Employee</h4>
+                            <small style="opacity: 0.9;">Add a new employee to the system</small>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form asp-action="CreateEmployee" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        @* Hidden field - automatically set to 123, not visible to user *@
+                <!-- Body -->
+                <div class="card-body p-4">
+                    <form asp-action="CreateEmployee" method="post" id="createEmployeeForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        @* Hidden field *@
                         <input type="hidden" asp-for="ApplicationUserID" value="123" />
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="UserName" class="form-label">Username *</label>
-                                <input asp-for="UserName" class="form-control" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="FullName" class="form-label">Full Name *</label>
-                                <input asp-for="FullName" class="form-control" />
-                                <span asp-validation-for="FullName" class="text-danger"></span>
-                            </div>
+                        <!-- Account Information Section -->
+                        <div class="section-header mb-3">
+                            <h6 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-user-circle me-2"></i>Account Information
+                            </h6>
+                            <hr class="mt-2 mb-3">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Password" class="form-label">Password *</label>
-                                <input asp-for="Password" type="password" class="form-control" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <label asp-for="UserName" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-1"></i> Username <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                                <span asp-validation-for="UserName" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="StaffCode" class="form-label">Staff Code *</label>
-                                <input asp-for="StaffCode" class="form-control" />
-                                <span asp-validation-for="StaffCode" class="text-danger"></span>
+                                <label asp-for="Password" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-1"></i> Password <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input asp-for="Password" type="password" class="form-control" id="passwordField" placeholder="Enter password" />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
                             </div>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <div class="section-header mb-3 mt-4">
+                            <h6 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-id-card me-2"></i>Personal Information
+                            </h6>
+                            <hr class="mt-2 mb-3">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="JobTitle" class="form-label">Job Title *</label>
-                                <input asp-for="JobTitle" class="form-control" />
-                                <span asp-validation-for="JobTitle" class="text-danger"></span>
+                                <label asp-for="FullName" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-1"></i> Full Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="DateHired" class="form-label">Date Hired *</label>
+                                <label asp-for="StaffCode" class="form-label fw-semibold">
+                                    <i class="fas fa-id-badge me-1"></i> Staff Code <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="StaffCode" class="form-control" placeholder="Enter staff code" />
+                                <span asp-validation-for="StaffCode" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Employment Information Section -->
+                        <div class="section-header mb-3 mt-4">
+                            <h6 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-briefcase me-2"></i>Employment Information
+                            </h6>
+                            <hr class="mt-2 mb-3">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="JobTitle" class="form-label fw-semibold">
+                                    <i class="fas fa-user-tag me-1"></i> Job Title <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="JobTitle" class="form-control" placeholder="Enter job title" />
+                                <span asp-validation-for="JobTitle" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DateHired" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar-alt me-1"></i> Date Hired <span class="text-danger">*</span>
+                                </label>
                                 <input asp-for="DateHired" type="date" class="form-control" />
-                                <span asp-validation-for="DateHired" class="text-danger"></span>
+                                <span asp-validation-for="DateHired" class="text-danger small"></span>
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save"></i> Create Employee
-                            </button>
-                            <a href="@Url.Action("Employees")" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Employees
-                            </a>
+                        <!-- Info Alert -->
+                        <div class="alert alert-info border-0 mb-4 mt-3" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <small><strong>Note:</strong> All fields marked with <span class="text-danger">*</span> are required. The employee will receive login credentials via email.</small>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i> Create Employee
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="@Url.Action("Employees", "Admin")" class="btn btn-outline-secondary w-100 btn-lg">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to Employees
+                                </a>
+                            </div>
                         </div>
                     </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer bg-light text-center py-2">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt text-success me-1"></i>
+                        All employee data is securely encrypted
+                    </small>
                 </div>
             </div>
         </div>
@@ -78,4 +152,37 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // Toggle password visibility
+            $('#togglePassword').on('click', function() {
+                const passwordField = $('#passwordField');
+                const icon = $(this).find('i');
+
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            $('input[type="date"]').val(today);
+
+            // Form submission
+            $('#createEmployeeForm').on('submit', function() {
+                const btn = $(this).find('button[type="submit"]');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Creating Employee...');
+            });
+
+          
+
+           
+        });
+    </script>
 }

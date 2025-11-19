@@ -6,97 +6,193 @@
     Layout = "_Layout";
 }
 
-<div class="container">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-user-plus"></i> Bank Account Application</h4>
+        <div class="col-lg-9 col-md-10">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="fas fa-university fa-3x text-primary"></i>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <h2 class="fw-bold">Open Your Bank Account</h2>
+                <p class="text-muted">Complete the form below to start your banking journey with us</p>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                <!-- Card Header -->
+                <div class="card-header text-white">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-alt fa-2x me-3" style="color: black;"></i>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Account Application Form</h4>
+                            <small style="opacity: 0.9;color:black">All fields marked with * are required</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" id="applicationForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <div class="section-header mb-3">
+                            <h5 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h5>
+                            <hr class="mt-2 mb-3">
+                        </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="FullName" class="form-label">Full Name *</label>
-                                <input asp-for="FullName" class="form-control" />
-                                <span asp-validation-for="FullName" class="text-danger"></span>
+                                <label asp-for="FullName" class="form-label fw-semibold">
+                                    <i class="fas fa-user-circle me-1"></i> Full Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="DateOfBirth" class="form-label">Date of Birth *</label>
+                                <label asp-for="DateOfBirth" class="form-label fw-semibold">
+                                    <i class="fas fa-birthday-cake me-1"></i> Date of Birth <span class="text-danger">*</span>
+                                </label>
                                 <input asp-for="DateOfBirth" type="date" class="form-control" />
-                                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Gender" class="form-label">Gender *</label>
+                                <label asp-for="Gender" class="form-label fw-semibold">
+                                    <i class="fas fa-venus-mars me-1"></i> Gender <span class="text-danger">*</span>
+                                </label>
                                 <select asp-for="Gender" class="form-select">
-                                    <option value="">Select Gender</option>
+                                    <option value="">-- Select Gender --</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>
                                 </select>
-                                <span asp-validation-for="Gender" class="text-danger"></span>
+                                <span asp-validation-for="Gender" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Occupation" class="form-label">Occupation *</label>
-                                <input asp-for="Occupation" class="form-control" />
-                                <span asp-validation-for="Occupation" class="text-danger"></span>
+                                <label asp-for="Occupation" class="form-label fw-semibold">
+                                    <i class="fas fa-briefcase me-1"></i> Occupation <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Occupation" class="form-control" placeholder="Enter your occupation" />
+                                <span asp-validation-for="Occupation" class="text-danger small"></span>
                             </div>
+                        </div>
+
+                        <!-- Contact Information Section -->
+                        <div class="section-header mb-3 mt-4">
+                            <h5 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-phone me-2"></i>Contact Information
+                            </h5>
+                            <hr class="mt-2 mb-3">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="MobileNumber" class="form-label">Mobile Number *</label>
-                                <input asp-for="MobileNumber" class="form-control" />
-                                <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                                <label asp-for="MobileNumber" class="form-label fw-semibold">
+                                    <i class="fas fa-mobile-alt me-1"></i> Mobile Number <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="MobileNumber" class="form-control" placeholder="Enter 10-digit mobile number" maxlength="10" data-type="phone" />
+                                <span asp-validation-for="MobileNumber" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="AadharNumber" class="form-label">Aadhar Number *</label>
-                                <input asp-for="AadharNumber" class="form-control" maxlength="12" />
-                                <span asp-validation-for="AadharNumber" class="text-danger"></span>
+                                <label asp-for="AadharNumber" class="form-label fw-semibold">
+                                    <i class="fas fa-id-card me-1"></i> Aadhar Number <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="AadharNumber" class="form-control" placeholder="Enter 12-digit Aadhar number" maxlength="12" data-type="aadhar" />
+                                <span asp-validation-for="AadharNumber" class="text-danger small"></span>
                             </div>
+                        </div>
+
+                        <!-- Account Details Section -->
+                        <div class="section-header mb-3 mt-4">
+                            <h5 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-university me-2"></i>Account Details
+                            </h5>
+                            <hr class="mt-2 mb-3">
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="PAN" class="form-label">PAN *</label>
-                                <input asp-for="PAN" class="form-control" maxlength="10" style="text-transform: uppercase;" />
-                                <span asp-validation-for="PAN" class="text-danger"></span>
+                                <label asp-for="PAN" class="form-label fw-semibold">
+                                    <i class="fas fa-address-card me-1"></i> PAN Number <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="PAN" class="form-control text-uppercase" placeholder="Enter PAN (e.g., ABCDE1234F)" maxlength="10" data-type="pan" />
+                                <span asp-validation-for="PAN" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="AccountTypeID" class="form-label">Account Type *</label>
+                                <label asp-for="AccountTypeID" class="form-label fw-semibold">
+                                    <i class="fas fa-wallet me-1"></i> Account Type <span class="text-danger">*</span>
+                                </label>
                                 <select asp-for="AccountTypeID" class="form-select">
-                                    <option value="">Select Account Type</option>
+                                    <option value="">-- Select Account Type --</option>
                                     <option value="1">Savings Account</option>
                                     <option value="2">Current Account</option>
                                 </select>
-                                <span asp-validation-for="AccountTypeID" class="text-danger"></span>
+                                <span asp-validation-for="AccountTypeID" class="text-danger small"></span>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="ImageFile" class="form-label">Profile Image</label>
-                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
-                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        <!-- Document Upload Section -->
+                        <div class="section-header mb-3 mt-4">
+                            <h5 class="text-primary fw-bold mb-0">
+                                <i class="fas fa-upload me-2"></i>Profile Photo
+                            </h5>
+                            <hr class="mt-2 mb-3">
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-paper-plane"></i> Submit Application
-                            </button>
-                            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to Home
-                            </a>
+                        <div class="mb-4">
+                            <label asp-for="ImageFile" class="form-label fw-semibold">
+                                <i class="fas fa-camera me-1"></i> Upload Profile Image
+                            </label>
+                            <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" id="imageInput" />
+                            <small class="text-muted d-block mt-1">
+                                <i class="fas fa-info-circle me-1"></i>Accepted formats: JPG, PNG (Max size: 2MB)
+                            </small>
+                            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+
+                            <!-- Image Preview -->
+                            <div id="imagePreview" class="mt-3" style="display: none;">
+                                <p class="small fw-semibold text-muted mb-2">Preview:</p>
+                                <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                            </div>
+                        </div>
+
+                        
+
+                        <!-- Submit Buttons -->
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-success w-100 btn-lg">
+                                    <i class="fas fa-paper-plane me-2"></i> Submit Application
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary w-100 btn-lg">
+                                    <i class="fas fa-arrow-left me-2"></i> Back to Home
+                                </a>
+                            </div>
                         </div>
                     </form>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="card-footer bg-light text-center py-3">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt text-success me-1"></i>
+                        Your information is secure and encrypted 
+                       
+                    </small>
                 </div>
             </div>
         </div>
@@ -105,4 +201,104 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // Image preview
+            $('#imageInput').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Check file size (2MB max)
+                    if (file.size > 2 * 1024 * 1024) {
+                        toastr.error('Image size must be less than 2MB');
+                        $(this).val('');
+                        $('#imagePreview').hide();
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#previewImg').attr('src', e.target.result);
+                        $('#imagePreview').fadeIn();
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#imagePreview').hide();
+                }
+            });
+
+            // Set max date for DOB (18 years ago)
+            const today = new Date();
+            const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+            const maxDateString = maxDate.toISOString().split('T')[0];
+            $('input[name="DateOfBirth"]').attr('max', maxDateString);
+
+            // Set min date (100 years ago)
+            const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
+            const minDateString = minDate.toISOString().split('T')[0];
+            $('input[name="DateOfBirth"]').attr('min', minDateString);
+
+            // Form submission
+            $('#applicationForm').on('submit', function() {
+                const btn = $(this).find('button[type="submit"]');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Submitting Application...');
+
+                // Show loading overlay
+                //showLoading('Processing your application...');
+            });
+
+            // Age validation
+            $('input[name="DateOfBirth"]').on('change', function() {
+                const dob = new Date($(this).val());
+                const today = new Date();
+                const age = today.getFullYear() - dob.getFullYear();
+
+                if (age < 18) {
+                    toastr.warning('You must be at least 18 years old to apply');
+                    $(this).val('');
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Section Headers */
+        .section-header h5 {
+            display: inline-block;
+            position: relative;
+        }
+
+        /* Form transition */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        /* Image preview styling */
+        #imagePreview {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+    </style>
 }

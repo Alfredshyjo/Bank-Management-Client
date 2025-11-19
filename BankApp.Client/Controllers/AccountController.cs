@@ -6,167 +6,348 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Text;
 
-namespace BankApp.Client.Controllers
+public class AccountController : Controller
+
 {
-    public class AccountController : Controller
+
+    private readonly IGenericHttpClient _httpClient;
+
+    public AccountController(IGenericHttpClient httpClient)
+
     {
-        private readonly IGenericHttpClient _httpClient;
 
-        public AccountController(IGenericHttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        _httpClient = httpClient;
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                var userRequest = new UserRequest
-                {
-                    UserName = model.UserName,
-                    Password = model.Password
-                };
-
-                var result = await _httpClient.PostAsync<Result<UserResponse>>(ApiConstant.Authenticate, userRequest);
-
-                if (result.IsError)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
-                    }
-                    return View(model);
-                }
-
-                var userResponse = result.Response;
-                var encodedData = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{model.UserName}:{model.Password}"));
-
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, userResponse.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, userResponse.Id),
-                    new Claim("UserId", userResponse.Id),
-                    new Claim("FullName", userResponse.FullName),
-                    new Claim("basicauth", encodedData)
-                };
-
-                if (userResponse.Roles != null && userResponse.Roles.Any())
-                {
-                    foreach (var role in userResponse.Roles)
-                    {
-                        claims.Add(new Claim(ClaimTypes.Role, role));
-                    }
-                }
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
-
-                // Check if password change is required
-                if (userResponse.MustChangePassword)
-                {
-                    TempData["InfoMessage"] = "You must change your password before continuing.";
-                    return RedirectToAction("ChangePassword");
-                }
-
-                // Redirect based on role
-                if (userResponse.Roles.Contains("Admin"))
-                    return RedirectToAction("Dashboard", "Admin");
-                else if (userResponse.Roles.Contains("Manager"))
-                    return RedirectToAction("Dashboard", "Manager");
-                else
-                    return RedirectToAction("Dashboard", "Customer");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again.");
-                return View(model);
-            }
-        }
-
-        [Authorize]
-        [HttpGet]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
-
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            try
-            {
-                var request = new ChangePasswordRequest
-                {
-                    CurrentPassword = model.CurrentPassword,
-                    NewPassword = model.NewPassword
-                };
-
-                var result = await _httpClient.PostAsync<Result<bool>>(ApiConstant.ChangePassword, request);
-
-                if (result.IsError)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
-                    }
-                    return View(model);
-                }
-
-                TempData["SuccessMessage"] = "Password changed successfully. Please login again.";
-                return RedirectToAction("Logout");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, "An error occurred while changing password.");
-                return View(model);
-            }
-        }
-
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
-        }
-
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
     }
+
+    [HttpGet]
+
+    public IActionResult Login()
+
+    {
+
+        // If already logged in, redirect to appropriate dashboard
+
+        if (User.Identity.IsAuthenticated)
+
+        {
+
+            return RedirectToDashboard();
+
+        }
+
+        return View();
+
+    }
+
+    [HttpPost]
+
+    [ValidateAntiForgeryToken]
+
+    public async Task<IActionResult> Login(LoginViewModel model)
+
+    {
+
+        if (!ModelState.IsValid)
+
+        {
+
+            return View(model);
+
+        }
+
+        try
+
+        {
+
+            var userRequest = new UserRequest
+
+            {
+
+                UserName = model.UserName,
+
+                Password = model.Password
+
+            };
+
+            var result = await _httpClient.PostAsync<Result<UserResponse>>(ApiConstant.Authenticate, userRequest);
+
+            if (result == null)
+
+            {
+
+                ModelState.AddModelError(string.Empty, "Failed to connect to authentication service");
+
+                return View(model);
+
+            }
+
+            if (result.IsError)
+
+            {
+
+                foreach (var error in result.Errors)
+
+                {
+
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                }
+
+                return View(model);
+
+            }
+
+            var userResponse = result.Response;
+
+            if (userResponse == null)
+
+            {
+
+                ModelState.AddModelError(string.Empty, "Invalid response from authentication service");
+
+                return View(model);
+
+            }
+
+            // Create claims including JWT token
+
+            var claims = new List<Claim>
+
+                {
+
+                    new Claim(ClaimTypes.Name, userResponse.UserName),
+
+                    new Claim(ClaimTypes.NameIdentifier, userResponse.Id),
+
+                    new Claim("UserId", userResponse.Id),
+
+                    new Claim("FullName", userResponse.FullName),
+
+                    new Claim("jwttoken", userResponse.Token ?? "")
+
+                };
+
+            // Add role claims
+
+            if (userResponse.Roles != null && userResponse.Roles.Any())
+
+            {
+
+                foreach (var role in userResponse.Roles)
+
+                {
+
+                    claims.Add(new Claim(ClaimTypes.Role, role));
+
+                }
+
+            }
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+
+            {
+
+                IsPersistent = true,
+
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+
+            };
+
+            await HttpContext.SignInAsync(
+
+                CookieAuthenticationDefaults.AuthenticationScheme,
+
+                new ClaimsPrincipal(claimsIdentity),
+
+                authProperties);
+
+            // Check if password change is required
+
+            if (userResponse.MustChangePassword)
+
+            {
+
+                TempData["InfoMessage"] = "You must change your password before continuing.";
+
+                return RedirectToAction("ChangePassword");
+
+            }
+
+            // ⭐ Redirect to appropriate dashboard based on role
+
+            return RedirectToDashboard();
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+            ModelState.AddModelError(string.Empty, $"An error occurred during login: {ex.Message}");
+
+            return View(model);
+
+        }
+
+    }
+
+    // ⭐ Helper method to redirect to correct dashboard
+
+    private IActionResult RedirectToDashboard()
+
+    {
+
+        if (User.IsInRole("Admin"))
+
+        {
+
+            return RedirectToAction("Dashboard", "Admin");
+
+        }
+
+        else if (User.IsInRole("Manager"))
+
+        {
+
+            return RedirectToAction("Dashboard", "Manager");
+
+        }
+
+        else if (User.IsInRole("Customer"))
+
+        {
+
+            return RedirectToAction("Dashboard", "Customer");
+
+        }
+
+        else
+
+        {
+
+            // Default fallback
+
+            return RedirectToAction("Index", "Home");
+
+        }
+
+    }
+
+    [Authorize]
+
+    public async Task<IActionResult> Logout()
+
+    {
+
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        return RedirectToAction("Login");
+
+    }
+
+    public IActionResult AccessDenied()
+
+    {
+
+        return View();
+
+    }
+
+    [Authorize]
+
+    [HttpGet]
+
+    public IActionResult ChangePassword()
+
+    {
+
+        return View();
+
+    }
+
+    [Authorize]
+
+    [HttpPost]
+
+    [ValidateAntiForgeryToken]
+
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+
+    {
+
+        if (!ModelState.IsValid)
+
+        {
+
+            return View(model);
+
+        }
+
+        try
+
+        {
+
+            var request = new ChangePasswordRequest
+
+            {
+
+                CurrentPassword = model.CurrentPassword,
+
+                NewPassword = model.NewPassword
+
+            };
+
+            var result = await _httpClient.PostAsync<Result<bool>>(ApiConstant.ChangePassword, request);
+
+            if (result.IsError)
+
+            {
+
+                foreach (var error in result.Errors)
+
+                {
+
+                    ModelState.AddModelError(string.Empty, error.ErrorMessage);
+
+                }
+
+                return View(model);
+
+            }
+
+            TempData["SuccessMessage"] = "Password changed successfully. Please login again.";
+
+            return RedirectToAction("Logout");
+
+        }
+
+        catch (HttpRequestException ex)
+
+        {
+
+            ModelState.AddModelError(string.Empty, $"API Error: {ex.Message}");
+
+            return View(model);
+
+        }
+
+        catch (Exception ex)
+
+        {
+
+            ModelState.AddModelError(string.Empty, "An error occurred while changing password.");
+
+            return View(model);
+
+        }
+
+    }
+
+
 }
+
+

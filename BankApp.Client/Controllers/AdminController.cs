@@ -125,8 +125,9 @@ namespace BankApp.Client.Controllers
                     return RedirectToAction("Employees");
                 }
 
-                var viewModel = new EmployeeViewModel
+                var viewModel = new EditEmployeeViewModel
                 {
+                    ApplicationUserId=result.Response.ApplicationUserID,
                     UserName = result.Response.UserName,
                     FullName = result.Response.FullName,
                     StaffCode = result.Response.StaffCode,
@@ -146,7 +147,7 @@ namespace BankApp.Client.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditEmployee(int id, EmployeeViewModel model)
+        public async Task<IActionResult> EditEmployee(int id, EditEmployeeViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -159,11 +160,13 @@ namespace BankApp.Client.Controllers
                 var employeeDto = new EmployeeDto
                 {
                     EmployeeID = id,
+                    ApplicationUserID=model.ApplicationUserId,
                     UserName = model.UserName,
                     FullName = model.FullName,
                     StaffCode = model.StaffCode,
                     JobTitle = model.JobTitle,
-                    DateHired = model.DateHired
+                    DateHired = model.DateHired,
+
                 };
 
                 var url = string.Format(ApiConstant.UpdateEmployee, id);

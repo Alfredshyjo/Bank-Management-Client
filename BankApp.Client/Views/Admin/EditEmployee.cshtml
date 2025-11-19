@@ -1,5 +1,5 @@
 ﻿@using BankApp.Client.ViewModels
-@model EmployeeViewModel
+@model EditEmployeeViewModel
 
 @{
     ViewData["Title"] = "Edit Employee";
@@ -20,7 +20,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="UserName" class="form-label">Username *</label>
-                                <input asp-for="UserName" class="form-control" />
+                                <input asp-for="UserName" class="form-control" readonly />
                                 <span asp-validation-for="UserName" class="text-danger"></span>
                             </div>
 
@@ -50,6 +50,8 @@
                             <input asp-for="DateHired" type="date" class="form-control" />
                             <span asp-validation-for="DateHired" class="text-danger"></span>
                         </div>
+
+                        <input asp-for="ApplicationUserId" type="hidden" />
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-warning btn-lg">

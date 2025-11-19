@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankApp.Client.Controllers
 {
     //[Authorize(Roles = "Customer")]
-    //[Route("Customer")]
+   
     public class CustomerController : Controller
     {
         private readonly IGenericHttpClient _httpClient;
