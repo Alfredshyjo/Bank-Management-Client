@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankApp.Client.Controllers
 {
     //[Authorize(Roles = "Customer")]
-   
+
     public class CustomerController : Controller
     {
         private readonly IGenericHttpClient _httpClient;
@@ -207,7 +207,6 @@ namespace BankApp.Client.Controllers
             }
         }
 
-
         [HttpGet]
         public async Task<JsonResult> GetAccountDetails(int accountId)
         {
@@ -228,5 +227,160 @@ namespace BankApp.Client.Controllers
                 return Json(new { success = false, message = "Error fetching account details" });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateAccount()
+        {
+            try
+            {
+                var userId = User.FindFirst("UserId")?.Value;
+                var customerUrl = string.Format(ApiConstant.GetCustomerByUserId, userId);
+                var customerResult = await _httpClient.GetAsync<Result<CustomerDto>>(customerUrl);
+
+                if (customerResult == null || customerResult.IsError || customerResult.Response == null)
+                {
+                    TempData["ErrorMessage"] = "Failed to load customer data.";
+                    return RedirectToAction("Dashboard");
+                }
+
+                var customer = customerResult.Response;
+
+                // Get existing accounts
+                var accountsUrl = string.Format(ApiConstant.GetAccountsByCustomerId, customer.CustomerID);
+                var accountsResult = await _httpClient.GetAsync<Result<List<AccountDto>>>(accountsUrl);
+
+                var existingAccounts = accountsResult != null && !accountsResult.IsError && accountsResult.Response != null
+                    ? accountsResult.Response
+                    : new List<AccountDto>();
+
+                // Get existing account type IDs
+                var existingAccountTypeIds = existingAccounts.Select(a => a.AccountTypeID).ToList();
+
+                // ⭐ Only 3 account types: Savings, Current, Fixed Deposit
+                var allAccountTypes = new List<AccountTypeDto>
+                {
+                    new AccountTypeDto { AccountTypeId = 1, Name = "Savings Account" },
+                    new AccountTypeDto { AccountTypeId = 2, Name = "Current Account" },
+                    new AccountTypeDto { AccountTypeId = 3, Name = "Fixed Deposit Account" }
+                };
+
+                // Filter out account types customer already has
+                var availableAccountTypes = allAccountTypes
+                    .Where(at => !existingAccountTypeIds.Contains(at.AccountTypeId))
+                    .ToList();
+
+                if (!availableAccountTypes.Any())
+                {
+                    TempData["InfoMessage"] = "You already have all available account types (Savings, Current, and Fixed Deposit).";
+                    return RedirectToAction("Dashboard");
+                }
+
+                var viewModel = new CreateAccountViewModel
+                {
+                    CustomerID = customer.CustomerID,
+                    AvailableAccountTypes = availableAccountTypes
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                return RedirectToAction("Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAccount(CreateAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Reload available account types
+                var userId = User.FindFirst("UserId")?.Value;
+                var customerUrl = string.Format(ApiConstant.GetCustomerByUserId, userId);
+                var customerResult = await _httpClient.GetAsync<Result<CustomerDto>>(customerUrl);
+
+                if (customerResult != null && !customerResult.IsError && customerResult.Response != null)
+                {
+                    var accountsUrl = string.Format(ApiConstant.GetAccountsByCustomerId, customerResult.Response.CustomerID);
+                    var accountsResult = await _httpClient.GetAsync<Result<List<AccountDto>>>(accountsUrl);
+                    var existingAccounts = accountsResult?.Response ?? new List<AccountDto>();
+                    var existingAccountTypeIds = existingAccounts.Select(a => a.AccountTypeID).ToList();
+
+                    var allAccountTypes = new List<AccountTypeDto>
+            {
+                new AccountTypeDto { AccountTypeId = 1, Name = "Savings Account" },
+                new AccountTypeDto { AccountTypeId = 2, Name = "Current Account" },
+                new AccountTypeDto { AccountTypeId = 3, Name = "Fixed Deposit Account" }
+            };
+
+                    model.AvailableAccountTypes = allAccountTypes
+                        .Where(at => !existingAccountTypeIds.Contains(at.AccountTypeId))
+                        .ToList();
+                }
+
+                return View(model);
+            }
+
+            try
+            {
+                var accountDto = new AccountDto
+                {
+                    CustomerID = model.CustomerID,
+                    AccountTypeID = model.AccountTypeID,
+                    Balance = 0, // Initial balance
+                    Status = "Active", // String value, not int
+                    AccountNumber = "", // Will be generated by API
+                    OpenDate = DateTime.Now,
+                    IsActive = true
+                };
+
+                var result = await _httpClient.PostAsync<Result<AccountDto>>(ApiConstant.CreateAccount, accountDto);
+
+                if (result.IsError)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+
+                    // Reload available account types
+                    var userId = User.FindFirst("UserId")?.Value;
+                    var customerUrl = string.Format(ApiConstant.GetCustomerByUserId, userId);
+                    var customerResult = await _httpClient.GetAsync<Result<CustomerDto>>(customerUrl);
+
+                    if (customerResult != null && !customerResult.IsError && customerResult.Response != null)
+                    {
+                        var accountsUrl = string.Format(ApiConstant.GetAccountsByCustomerId, customerResult.Response.CustomerID);
+                        var accountsResult = await _httpClient.GetAsync<Result<List<AccountDto>>>(accountsUrl);
+                        var existingAccounts = accountsResult?.Response ?? new List<AccountDto>();
+                        var existingAccountTypeIds = existingAccounts.Select(a => a.AccountTypeID).ToList();
+
+                        var allAccountTypes = new List<AccountTypeDto>
+                {
+                    new AccountTypeDto { AccountTypeId = 1, Name = "Savings Account" },
+                    new AccountTypeDto { AccountTypeId = 2, Name = "Current Account" },
+                    new AccountTypeDto { AccountTypeId = 3, Name = "Fixed Deposit Account" }
+                };
+
+                        model.AvailableAccountTypes = allAccountTypes
+                            .Where(at => !existingAccountTypeIds.Contains(at.AccountTypeId))
+                            .ToList();
+                    }
+
+                    return View(model);
+                }
+
+                TempData["SuccessMessage"] = $"Account created successfully! Account Number: {result.Response.AccountNumber}";
+                return RedirectToAction("Dashboard");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
+                return View(model);
+            }
+        }
+
     }
 }

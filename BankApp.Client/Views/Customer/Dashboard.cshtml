@@ -144,10 +144,13 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-semibold">
                         <i class="fas fa-university text-primary me-2"></i>My Accounts
                     </h5>
+                    <a href="@Url.Action("CreateAccount", "Customer")" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i> Create Account
+                    </a>
                 </div>
                 <div class="card-body p-4">
                     @if (Model.Accounts.Any())
@@ -328,7 +331,6 @@
                 transform: translateY(-5px);
                 box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
             }
-
             /* Ensure card body uses flexbox for consistent alignment */
             .dashboard-card .card-body {
                 display: flex;
@@ -336,7 +338,6 @@
                 justify-content: space-between;
                 min-height: 120px;
             }
-
         /* Stat Icon - Fixed dimensions */
         .stat-icon {
             width: 56px;
@@ -352,7 +353,6 @@
             .stat-icon i {
                 line-height: 1;
             }
-
         /* Ensure consistent heading heights */
         .dashboard-card h2 {
             line-height: 1.2;
@@ -360,19 +360,16 @@
             display: flex;
             align-items: center;
         }
-
         /* Consistent label heights */
         .dashboard-card .text-uppercase {
             line-height: 1.5;
             min-height: 1.5rem;
         }
-
         /* Bottom text alignment */
         .dashboard-card small {
             line-height: 1.5;
             display: block;
         }
-
         /* Account Card Styling */
         .account-card {
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
@@ -385,7 +382,6 @@
                 box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
                 transform: translateY(-3px);
             }
-
         /* Table Styling */
         #transactionsTable tbody tr {
             transition: all 0.2s ease;
@@ -395,7 +391,6 @@
                 background-color: #f8f9fa;
                 transform: scale(1.01);
             }
-
         /* Chart container fixes */
         canvas {
             max-height: 280px !important;
